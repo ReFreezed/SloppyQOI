@@ -1,4 +1,4 @@
-QOI compared to PNG
+QOI compared to PNG, per file
 Decode: 0.94203583676984
 Encode: 0.73869054758342
 Size:   1.7947511869579

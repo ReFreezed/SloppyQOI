@@ -125,7 +125,7 @@ if ANALYZE_TEST_SUITE_RESULTS then
 		sizeDiff       = sizeDiff       + qoiSize       / pngSize
 	end
 
-	print("QOI compared to PNG")
+	print("QOI compared to PNG, per file")
 	print("Decode: "..decodeTimeDiff/count)
 	print("Encode: "..encodeTimeDiff/count)
 	print("Size:   "..sizeDiff/count)
