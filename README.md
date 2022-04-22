@@ -1,8 +1,8 @@
-**SloppyQOI** is a small [QOI](https://qoiformat.org/) image format encoder and decoder library for the [LÖVE](https://love2d.org/) game framework.
+# SloppyQOI
 
+**SloppyQOI** is a small [QOI](https://qoiformat.org/) image format encoder and decoder library for the [LÖVE](https://love2d.org/) game framework.
 [The library](https://raw.githubusercontent.com/ReFreezed/SloppyQOI/master/qoi.lua) is a single file with no external dependencies other than LÖVE.
 [MIT license](LICENSE.txt).
-
 See the top of [qoi.lua](https://raw.githubusercontent.com/ReFreezed/SloppyQOI/master/qoi.lua) for documentation.
 
 I mostly just made this for fun.
