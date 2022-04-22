@@ -1,6 +1,6 @@
 --[[============================================================
 --=
---=  QOI image format encoder/decoder v1.0 for LÖVE
+--=  SloppyQOI - QOI image format encoder/decoder for LÖVE
 --=  - Written by Marcus 'ReFreezed' Thunström
 --=  - MIT License (See the bottom of this file)
 --=
@@ -31,9 +31,14 @@
 	Write an image to a QOI file (using love.filesystem).
 	The PixelFormat for imageData must currently be "rgba8".
 
+	qoi._VERSION
+	The current version of the library, e.g. "1.8.2".
+
 --============================================================]]
 
-local qoi = {}
+local qoi = {
+	_VERSION = "1.0.0",
+}
 
 
 
