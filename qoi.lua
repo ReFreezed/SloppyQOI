@@ -100,19 +100,18 @@ function qoi.decode(s)
 	local prevB = 0
 	local prevA = 255
 
+	local r = prevR
+	local g = prevG
+	local b = prevB
+	local a = prevA
+
 	local run = 0
 
 	local floor = math.floor
 
 	for pixelIz = 0, 4*w*h-1, 4 do
-		local r, g, b, a
-
 		if run > 0 then
 			run = run - 1
-			r   = prevR
-			g   = prevG
-			b   = prevB
-			a   = prevA
 
 		else
 			local byte1 = getByte(s, pos)
@@ -121,58 +120,50 @@ function qoi.decode(s)
 
 			-- QOI_OP_RGB 11111110
 			if byte1 == 254--[[11111110]] then
-				r = getByte(s, pos) ; if not r then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				g = getByte(s, pos) ; if not g then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				b = getByte(s, pos) ; if not b then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				a = prevA
+				r, g, b = getByte(s, pos, pos+2)
+				if not b then  return nil, "Unexpected end of data stream."  end
+				pos = pos + 3
 
 			-- QOI_OP_RGBA 11111111
 			elseif byte1 == 255--[[11111111]] then
-				r = getByte(s, pos) ; if not r then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				g = getByte(s, pos) ; if not g then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				b = getByte(s, pos) ; if not b then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-				a = getByte(s, pos) ; if not a then  return nil, "Unexpected end of data stream."  end ; pos = pos + 1
-
-			-- QOI_OP_RUN 11xxxxxx
-			elseif byte1 >= 192--[[11000000]] then
-				run = byte1 - 192--[[11000000]]
-				r   = prevR
-				g   = prevG
-				b   = prevB
-				a   = prevA
-
-			-- QOI_OP_LUMA 10xxxxxx
-			elseif byte1 >= 128--[[10000000]] then
-				local byte2 = getByte(s, pos)
-				if not byte2 then  return nil, "Unexpected end of data stream."  end
-				pos = pos + 1
-
-				local diffG       = byte1 - 128--[[10000000]] - 32
-				local diffR_diffG = floor(byte2/16) - 8
-				local diffB_diffG = byte2 % 16 - 8
-
-				g = (prevG + diffG) % 256
-				r = ((diffR_diffG + (g-prevG)) + prevR) % 256
-				b = ((diffB_diffG + (g-prevG)) + prevB) % 256
-				a = prevA
-
-			-- QOI_OP_DIFF 01xxxxxx
-			elseif byte1 >= 64--[[01000000]] then
-				byte1 = byte1 - 64--[[01000000]]
-
-				r = (prevR + floor(byte1/16)     - 2) % 256
-				g = (prevG + floor(byte1/4 ) % 4 - 2) % 256
-				b = (prevB +       byte1     % 4 - 2) % 256
-				a = prevA
+				r, g, b, a = getByte(s, pos, pos+3)
+				if not a then  return nil, "Unexpected end of data stream."  end
+				pos = pos + 4
 
 			-- QOI_OP_INDEX 00xxxxxx
-			else
-				local hash4 = (byte1 % 64) * 4
+			elseif byte1 < 64--[[01000000]] then
+				local hash4 = byte1 * 4
 
 				r = seen[hash4+1]
 				g = seen[hash4+2]
 				b = seen[hash4+3]
 				a = seen[hash4+4]
+
+			-- QOI_OP_DIFF 01xxxxxx
+			elseif byte1 < 128--[[10000000]] then
+				byte1 = byte1 - 64--[[01000000]]
+
+				r = (prevR + floor(byte1*.0625--[[/16]])     - 2) % 256
+				g = (prevG + floor(byte1*.25  --[[/4 ]]) % 4 - 2) % 256
+				b = (prevB +       byte1                 % 4 - 2) % 256
+
+			-- QOI_OP_LUMA 10xxxxxx
+			elseif byte1 < 192--[[11000000]] then
+				local byte2 = getByte(s, pos)
+				if not byte2 then  return nil, "Unexpected end of data stream."  end
+				pos = pos + 1
+
+				local diffG       = byte1 - 128--[[10000000]] - 32
+				local diffR_diffG = floor(byte2*.0625--[[/16]]) - 8
+				local diffB_diffG = byte2 % 16 - 8
+
+				g = (prevG + diffG) % 256
+				r = ((diffR_diffG + (g-prevG)) + prevR) % 256
+				b = ((diffB_diffG + (g-prevG)) + prevB) % 256
+
+			-- QOI_OP_RUN 11xxxxxx
+			else
+				run = byte1 - 192--[[11000000]]
 			end
 
 			prevR = r
@@ -316,9 +307,9 @@ function qoi.encode(imageData)
 				seen[hash4+4] = a
 
 				if a == prevA then
-					local deltaR = r - prevR
-					local deltaG = g - prevG
-					local deltaB = b - prevB
+					local deltaR = (r - prevR + 128) % 256 - 128
+					local deltaG = (g - prevG + 128) % 256 - 128
+					local deltaB = (b - prevB + 128) % 256 - 128
 
 					if     deltaR >= -2 and deltaR <= 1
 					   and deltaG >= -2 and deltaG <= 1

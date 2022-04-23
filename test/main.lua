@@ -5,11 +5,14 @@
 --============================================================]]
 
 local RUN_TEST_SUITE             = 1==0 -- Needs folder "suite/" to have the contents from <https://qoiformat.org/benchmark/qoi_benchmark_suite.tar>.
-local ANALYZE_TEST_SUITE_RESULTS = 1==0
+local ANALYZE_TEST_SUITE_RESULTS = 1==0 -- Outputs to stdout!
 
 local TEST_SUITE_START_INDEX = 1
 local TEST_SUITE_END_INDEX   = 1/0
-local TEST_ENCODING          = 1==1 -- Doesn't affect test suite.
+
+local TEST_SUITE_RESULTS_FILE = "Test suite results (2022-04-22, #3).txt" -- For ANALYZE_TEST_SUITE_RESULTS.
+
+local TEST_ENCODING = 1==1 -- Doesn't affect test suite.
 
 
 
@@ -45,51 +48,54 @@ if RUN_TEST_SUITE then
 	local paths = {}
 	collectPngFiles("suite", paths)
 
-	for i, path in ipairs(paths) do
-		if i >= TEST_SUITE_START_INDEX and i <= TEST_SUITE_END_INDEX then
-			print("["..i.."/"..#paths.."] "..path)
+	for i = math.max(TEST_SUITE_START_INDEX, 1), math.min(TEST_SUITE_END_INDEX, #paths) do
+		local path = paths[i]
 
+		print()
+		print("["..i.."/"..#paths.."] "..path)
+
+		local fileData      = love.filesystem.newFileData(path)
+		local time          = love.timer.getTime()
+		local ok, imageData = pcall(love.image.newImageData, fileData)
+		local pngDecodeTime = love.timer.getTime() - time
+		fileData:release()
+
+		if not ok then
+			io.stderr:write("Error: ", imageData, "\n")
+
+		else
 			local time          = love.timer.getTime()
-			local ok, imageData = pcall(love.image.newImageData, path)
-			local pngDecodeTime = love.timer.getTime() - time
+			local qoiData, err  = qoi.encode(imageData)
+			local qoiEncodeTime = love.timer.getTime() - time
 
-			if not ok then
-				io.stderr:write("Error: ", imageData, "\n")
+			if not qoiData then
+				io.stderr:write("Error: ", err, "\n")
 
 			else
-				local time          = love.timer.getTime()
-				local qoiData, err  = qoi.encode(imageData)
-				local qoiEncodeTime = love.timer.getTime() - time
+				local time            = love.timer.getTime()
+				local imageData2, err = qoi.decode(qoiData)
+				local qoiDecodeTime   = love.timer.getTime() - time
 
-				if not qoiData then
+				if not imageData2 then
 					io.stderr:write("Error: ", err, "\n")
 
 				else
-					local time            = love.timer.getTime()
-					local imageData2, err = qoi.decode(qoiData)
-					local qoiDecodeTime   = love.timer.getTime() - time
+					local time          = love.timer.getTime()
+					local fileData2     = imageData:encode("png", nil)
+					local pngEncodeTime = love.timer.getTime() - time
 
-					if not imageData2 then
-						io.stderr:write("Error: ", err, "\n")
+					print("size", imageData:getDimensions())
+					print("pngDecode", "-"                , pngDecodeTime*1000)
+					print("qoiDecode", "-"                , qoiDecodeTime*1000)
+					print("pngEncode", fileData2:getSize(), pngEncodeTime*1000)
+					print("qoiEncode", #qoiData           , qoiEncodeTime*1000)
 
-					else
-						local time          = love.timer.getTime()
-						local fileData      = imageData:encode("png", nil)
-						local pngEncodeTime = love.timer.getTime() - time
-
-						print("size", imageData:getDimensions())
-						print("pngDecode", "-"               , pngDecodeTime*1000)
-						print("qoiDecode", "-"               , qoiDecodeTime*1000)
-						print("pngEncode", fileData:getSize(), pngEncodeTime*1000)
-						print("qoiEncode", #qoiData          , qoiEncodeTime*1000)
-
-						fileData:release()
-						imageData2:release()
-					end
+					fileData2:release()
+					imageData2:release()
 				end
-
-				imageData:release()
 			end
+
+			imageData:release()
 		end
 	end
 
@@ -102,14 +108,25 @@ end
 -- Analyze test suite results.
 --
 if ANALYZE_TEST_SUITE_RESULTS then
-	local file = io.open(REPO_DIR.."/docs/Test suite results.txt")
+	local file = io.open(REPO_DIR.."/docs/"..TEST_SUITE_RESULTS_FILE)
 	local s    = file:read"*a"
 	file:close()
 
-	local count          = 0
-	local decodeTimeDiff = 0
-	local encodeTimeDiff = 0
-	local sizeDiff       = 0
+	local folders = {}
+
+	local count = {total=0}
+
+	local decodeTimeDiff = {total=0}
+	local encodeTimeDiff = {total=0}
+	local sizeDiff       = {total=0}
+
+	local decodeTimeSumPng = {total=0}
+	local decodeTimeSumQoi = {total=0}
+	local encodeTimeSumPng = {total=0}
+	local encodeTimeSumQoi = {total=0}
+
+	local sizeSumPng = {total=0}
+	local sizeSumQoi = {total=0}
 
 	local pat = "%[%d+/%d+%] (%S[^\n]*)"
 	         .. "\nsize\t(%d+)\t(%d+)"
@@ -119,16 +136,74 @@ if ANALYZE_TEST_SUITE_RESULTS then
 	         .. "\nqoiEncode\t(%d+)\t([%d.]+)"
 
 	for path, w, h, pngDecodeTime, qoiDecodeTime, pngSize, pngEncodeTime, qoiSize, qoiEncodeTime in s:gmatch(pat) do
-		count          = count + 1
-		decodeTimeDiff = decodeTimeDiff + qoiDecodeTime / pngDecodeTime
-		encodeTimeDiff = encodeTimeDiff + qoiEncodeTime / pngEncodeTime
-		sizeDiff       = sizeDiff       + qoiSize       / pngSize
+		local folder = path:match"([^/]+)/[^/]+$"
+
+		if not count[folder] then
+			count           [folder] = 0
+			decodeTimeDiff  [folder] = 0
+			encodeTimeDiff  [folder] = 0
+			sizeDiff        [folder] = 0
+			decodeTimeSumPng[folder] = 0
+			decodeTimeSumQoi[folder] = 0
+			encodeTimeSumPng[folder] = 0
+			encodeTimeSumQoi[folder] = 0
+			sizeSumPng      [folder] = 0
+			sizeSumQoi      [folder] = 0
+			table.insert(folders, folder)
+		end
+
+		count.total   = count.total   + 1
+		count[folder] = count[folder] + 1
+
+		decodeTimeDiff.total   = decodeTimeDiff.total   + qoiDecodeTime / pngDecodeTime
+		decodeTimeDiff[folder] = decodeTimeDiff[folder] + qoiDecodeTime / pngDecodeTime
+		encodeTimeDiff.total   = encodeTimeDiff.total   + qoiEncodeTime / pngEncodeTime
+		encodeTimeDiff[folder] = encodeTimeDiff[folder] + qoiEncodeTime / pngEncodeTime
+		sizeDiff.total         = sizeDiff.total         + qoiSize       / pngSize
+		sizeDiff[folder]       = sizeDiff[folder]       + qoiSize       / pngSize
+
+		decodeTimeSumPng.total   = decodeTimeSumPng.total   + pngDecodeTime
+		decodeTimeSumPng[folder] = decodeTimeSumPng[folder] + pngDecodeTime
+		decodeTimeSumQoi.total   = decodeTimeSumQoi.total   + qoiDecodeTime
+		decodeTimeSumQoi[folder] = decodeTimeSumQoi[folder] + qoiDecodeTime
+		encodeTimeSumPng.total   = encodeTimeSumPng.total   + pngEncodeTime
+		encodeTimeSumPng[folder] = encodeTimeSumPng[folder] + pngEncodeTime
+		encodeTimeSumQoi.total   = encodeTimeSumQoi.total   + qoiEncodeTime
+		encodeTimeSumQoi[folder] = encodeTimeSumQoi[folder] + qoiEncodeTime
+
+		sizeSumPng.total   = sizeSumPng.total   + pngSize
+		sizeSumPng[folder] = sizeSumPng[folder] + pngSize
+		sizeSumQoi.total   = sizeSumQoi.total   + qoiSize
+		sizeSumQoi[folder] = sizeSumQoi[folder] + qoiSize
+
+		--[[
+		if 2*tonumber(pngDecodeTime) < tonumber(qoiDecodeTime) then
+			print(path)
+			print("-qoi", qoiDecodeTime)
+			print("-png", pngDecodeTime)
+			print()
+		end
+		--]]
 	end
 
-	print("QOI compared to PNG, per file")
-	print("Decode: "..decodeTimeDiff/count)
-	print("Encode: "..encodeTimeDiff/count)
-	print("Size:   "..sizeDiff/count)
+	table.insert(folders, "total")
+
+	for _, folder in ipairs(folders) do
+		print(folder)
+		print("  QOI compared to PNG, per file:")
+		print("    Decode: "..decodeTimeDiff[folder]/count[folder])
+		print("    Encode: "..encodeTimeDiff[folder]/count[folder])
+		print("    Size:   "..sizeDiff[folder]/count[folder])
+		print("  Average time:")
+		print("    DecodePNG: "..decodeTimeSumPng[folder]/count[folder])
+		print("    DecodeQOI: "..decodeTimeSumQoi[folder]/count[folder])
+		print("    EncodePNG: "..encodeTimeSumPng[folder]/count[folder])
+		print("    EncodeQOI: "..encodeTimeSumQoi[folder]/count[folder])
+		print("  Size sum:")
+		print("    PNG: "..sizeSumPng[folder])
+		print("    QOI: "..sizeSumQoi[folder])
+		print()
+	end
 
 	os.exit()
 end

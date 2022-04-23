@@ -1,0 +1,49 @@
+Times
+
+decode  17.53  dice.png
+decode  5.560  dice.qoi
+decode  13.02  kodim10.png
+decode  12.97  kodim10.qoi
+decode  14.96  kodim23.png
+decode  12.82  kodim23.qoi
+decode  1.589  qoi_logo.png
+decode  0.493  qoi_logo.qoi
+decode  1.353  testcard.png
+decode  0.723  testcard.qoi
+decode  1.155  testcard_rgba.png
+decode  0.608  testcard_rgba.qoi
+decode  38.19  wikipedia_008.png
+decode  33.43  wikipedia_008.qoi
+
+encode  82.28  dice.png
+encode  34.83  dice.qoi
+encode  157.5  kodim10.png
+encode  67.16  kodim10.qoi
+encode  181.2  kodim23.png
+encode  65.43  kodim23.qoi
+encode  8.235  qoi_logo.png
+encode  3.002  qoi_logo.qoi
+encode  8.293  testcard.png
+encode  3.087  testcard.qoi
+encode  9.479  testcard_rgba.png
+encode  3.394  testcard_rgba.qoi
+encode  554.8  wikipedia_008.png
+encode  152.0  wikipedia_008.qoi
+
+Decode with FFI:
+7.89  dice.qoi
+16.4  kodim10.qoi
+15.4  kodim23.qoi
+1.49  qoi_logo.qoi
+1.26  testcard.qoi
+1.15  testcard_rgba.qoi
+37.8  wikipedia_008.qoi
+
+Decode without FFI:
+24.1  dice.qoi
+33.0  kodim10.qoi
+32.4  kodim23.qoi
+4.01  qoi_logo.qoi
+3.39  testcard.qoi
+3.13  testcard_rgba.qoi
+80.8  wikipedia_008.qoi

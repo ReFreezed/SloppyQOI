@@ -1,0 +1,256 @@
+Test suite stats
+2022-04-22
+
+
+
+Per folder and total:
+
+icon_512
+  QOI compared to PNG, per file:
+    Decode: 0.33607452469875
+    Encode: 0.28086523846066
+    Size:   1.8086029648169
+  Average time:
+    DecodePNG: 6.3581715003868
+    DecodeQOI: 2.0934308654516
+    EncodePNG: 30.145410966668
+    EncodeQOI: 8.6495326206003
+  Size sum:
+    PNG: 10914584
+    QOI: 18658484
+
+icon_64
+  QOI compared to PNG, per file:
+    Decode: 0.44988099525168
+    Encode: 0.40965461290544
+    Size:   1.3020403803775
+  Average time:
+    DecodePNG: 0.16061330937051
+    DecodeQOI: 0.07168439290155
+    EncodePNG: 0.8851264984568
+    EncodeQOI: 0.36362529729927
+  Size sum:
+    PNG: 798452
+    QOI: 1001738
+
+photo_kodak
+  QOI compared to PNG, per file:
+    Decode: 1.068052571526
+    Encode: 0.46550790006457
+    Size:   1.0431310131497
+  Average time:
+    DecodePNG: 11.618242359062
+    DecodeQOI: 11.868879511757
+    EncodePNG: 133.07792512744
+    EncodeQOI: 59.853916424801
+  Size sum:
+    PNG: 15830335
+    QOI: 16501520
+
+photo_tecnick
+  QOI compared to PNG, per file:
+    Decode: 1.1715911010265
+    Encode: 0.44553917227259
+    Size:   1.1552511750686
+  Average time:
+    DecodePNG: 38.222484776551
+    DecodeQOI: 43.514074180265
+    EncodePNG: 553.86353211734
+    EncodeQOI: 231.16708644908
+  Size sum:
+    PNG: 223680490
+    QOI: 258843443
+
+photo_wikipedia
+  QOI compared to PNG, per file:
+    Decode: 0.97796780996351
+    Encode: 0.51925405126192
+    Size:   1.1438419843647
+  Average time:
+    DecodePNG: 35.897611367856
+    DecodeQOI: 33.533307093744
+    EncodePNG: 396.13492539459
+    EncodeQOI: 186.99023668851
+  Size sum:
+    PNG: 92295635
+    QOI: 105507130
+
+pngimg
+  QOI compared to PNG, per file:
+    Decode: 0.46764189329859
+    Encode: 0.36532838410482
+    Size:   1.5995587537651
+  Average time:
+    DecodePNG: 64.575284878047
+    DecodeQOI: 24.809651485279
+    EncodePNG: 401.99338328248
+    EncodeQOI: 132.76819244415
+  Size sum:
+    PNG: 232551703
+    QOI: 274984478
+
+screenshot_game
+  QOI compared to PNG, per file:
+    Decode: 0.58332069233204
+    Encode: 0.38659255750691
+    Size:   2.4282077687877
+  Average time:
+    DecodePNG: 19.740684237369
+    DecodeQOI: 10.776830225989
+    EncodePNG: 139.83923367076
+    EncodeQOI: 50.112007191214
+  Size sum:
+    PNG: 255772570
+    QOI: 328283551
+
+screenshot_web
+  QOI compared to PNG, per file:
+    Decode: 0.38698604755334
+    Encode: 0.34310845217883
+    Size:   1.2430595164478
+  Average time:
+    DecodePNG: 150.4121290749
+    DecodeQOI: 59.845571473789
+    EncodePNG: 741.51272768702
+    EncodeQOI: 266.88024578322
+  Size sum:
+    PNG: 30354783
+    QOI: 37984386
+
+textures_photo
+  QOI compared to PNG, per file:
+    Decode: 1.0898338623125
+    Encode: 0.56624157192784
+    Size:   1.1774185560285
+  Average time:
+    DecodePNG: 31.12713910584
+    DecodeQOI: 32.827039508544
+    EncodePNG: 311.56450589407
+    EncodeQOI: 170.12869947365
+  Size sum:
+    PNG: 35372565
+    QOI: 40589641
+
+textures_pk
+  QOI compared to PNG, per file:
+    Decode: 2.8311278964179
+    Encode: 1.2918095345921
+    Size:   1.8287477602161
+  Average time:
+    DecodePNG: 0.45948289893388
+    DecodeQOI: 1.1870841783151
+    EncodePNG: 5.0108224114575
+    EncodeQOI: 6.3184441866021
+  Size sum:
+    PNG: 43044377
+    QOI: 77558909
+
+textures_pk01
+  QOI compared to PNG, per file:
+    Decode: 0.67776914228718
+    Encode: 0.65446210988305
+    Size:   1.4744812073826
+  Average time:
+    DecodePNG: 4.1185476546758
+    DecodeQOI: 2.8731595813305
+    EncodePNG: 23.936036703094
+    EncodeQOI: 15.266006512444
+  Size sum:
+    PNG: 15752612
+    QOI: 20646004
+
+textures_pk02
+  QOI compared to PNG, per file:
+    Decode: 0.75227709663993
+    Encode: 0.60944630867147
+    Size:   1.4711609675166
+  Average time:
+    DecodePNG: 10.745046389559
+    DecodeQOI: 8.2194532004279
+    EncodePNG: 86.963491525238
+    EncodeQOI: 41.854746083005
+  Size sum:
+    PNG: 86146871
+    QOI: 115289941
+
+textures_plants
+  QOI compared to PNG, per file:
+    Decode: 0.46174039200439
+    Encode: 0.33934650148502
+    Size:   1.0885882379691
+  Average time:
+    DecodePNG: 36.024633994215
+    DecodeQOI: 15.184618425675
+    EncodePNG: 255.00910390234
+    EncodeQOI: 79.234469079906
+  Size sum:
+    PNG: 53193604
+    QOI: 56670920
+
+total
+  QOI compared to PNG, per file:
+    Decode: 1.3879457723159
+    Encode: 0.73182901109658
+    Size:   1.7940648739604
+  Average time:
+    DecodePNG: 13.977600090521
+    DecodeQOI: 8.3821554207432
+    EncodePNG: 107.42338965439
+    EncodeQOI: 42.527930365623
+  Size sum:
+    PNG: 1095708581
+    QOI: 1352520145
+
+
+
+Summaries:
+
+Decode: 65% faster to 40% slower - sometimes 180% slower
+0.33607452469875
+0.38698604755334
+0.44988099525168
+0.46174039200439
+0.46764189329859
+0.58332069233204
+0.67776914228718
+0.75227709663993
+0.97796780996351
+1.068052571526
+1.0898338623125
+1.1715911010265
+1.3879457723159
+2.8311278964179
+
+Encode: 25-70% faster - sometimes 30% slower
+0.28086523846066
+0.33934650148502
+0.34310845217883
+0.36532838410482
+0.38659255750691
+0.40965461290544
+0.44553917227259
+0.46550790006457
+0.51925405126192
+0.56624157192784
+0.60944630867147
+0.65446210988305
+0.73182901109658
+1.2918095345921
+
+Size: 5-80% larger - sometimes 140% larger
+1.0431310131497
+1.0885882379691
+1.1438419843647
+1.1552511750686
+1.1774185560285
+1.2430595164478
+1.3020403803775
+1.4711609675166
+1.4744812073826
+1.5995587537651
+1.7940648739604
+1.8086029648169
+1.8287477602161
+2.4282077687877
+
+
