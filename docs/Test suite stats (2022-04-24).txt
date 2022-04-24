@@ -1,5 +1,5 @@
 Test suite stats
-2022-04-22
+2022-04-24
 
 
 
@@ -7,12 +7,12 @@ Per folder and total:
 
 icon_512
   QOI compared to PNG, per file:
-    Decode: 0.33607452469875
+    Decode: 0.30076459476648
     Encode: 0.28086523846066
     Size:   1.8086029648169
   Average time:
     DecodePNG: 6.3581715003868
-    DecodeQOI: 2.0934308654516
+    DecodeQOI: 1.8709007237572
     EncodePNG: 30.145410966668
     EncodeQOI: 8.6495326206003
   Size sum:
@@ -21,12 +21,12 @@ icon_512
 
 icon_64
   QOI compared to PNG, per file:
-    Decode: 0.44988099525168
+    Decode: 0.41058490610189
     Encode: 0.40965461290544
     Size:   1.3020403803775
   Average time:
     DecodePNG: 0.16061330937051
-    DecodeQOI: 0.07168439290155
+    DecodeQOI: 0.065298998638555
     EncodePNG: 0.8851264984568
     EncodeQOI: 0.36362529729927
   Size sum:
@@ -35,12 +35,12 @@ icon_64
 
 photo_kodak
   QOI compared to PNG, per file:
-    Decode: 1.068052571526
+    Decode: 0.86035102892538
     Encode: 0.46550790006457
     Size:   1.0431310131497
   Average time:
     DecodePNG: 11.618242359062
-    DecodeQOI: 11.868879511757
+    DecodeQOI: 9.5750971804055
     EncodePNG: 133.07792512744
     EncodeQOI: 59.853916424801
   Size sum:
@@ -49,12 +49,12 @@ photo_kodak
 
 photo_tecnick
   QOI compared to PNG, per file:
-    Decode: 1.1715911010265
+    Decode: 0.91597653012336
     Encode: 0.44553917227259
     Size:   1.1552511750686
   Average time:
     DecodePNG: 38.222484776551
-    DecodeQOI: 43.514074180265
+    DecodeQOI: 34.059049425501
     EncodePNG: 553.86353211734
     EncodeQOI: 231.16708644908
   Size sum:
@@ -63,12 +63,12 @@ photo_tecnick
 
 photo_wikipedia
   QOI compared to PNG, per file:
-    Decode: 0.97796780996351
+    Decode: 0.75543458689158
     Encode: 0.51925405126192
     Size:   1.1438419843647
   Average time:
     DecodePNG: 35.897611367856
-    DecodeQOI: 33.533307093744
+    DecodeQOI: 25.966443054042
     EncodePNG: 396.13492539459
     EncodeQOI: 186.99023668851
   Size sum:
@@ -77,12 +77,12 @@ photo_wikipedia
 
 pngimg
   QOI compared to PNG, per file:
-    Decode: 0.46764189329859
+    Decode: 0.39557616287489
     Encode: 0.36532838410482
     Size:   1.5995587537651
   Average time:
     DecodePNG: 64.575284878047
-    DecodeQOI: 24.809651485279
+    DecodeQOI: 20.274685718742
     EncodePNG: 401.99338328248
     EncodeQOI: 132.76819244415
   Size sum:
@@ -91,12 +91,12 @@ pngimg
 
 screenshot_game
   QOI compared to PNG, per file:
-    Decode: 0.58332069233204
+    Decode: 0.50260641656483
     Encode: 0.38659255750691
     Size:   2.4282077687877
   Average time:
     DecodePNG: 19.740684237369
-    DecodeQOI: 10.776830225989
+    DecodeQOI: 8.9956229320566
     EncodePNG: 139.83923367076
     EncodeQOI: 50.112007191214
   Size sum:
@@ -105,12 +105,12 @@ screenshot_game
 
 screenshot_web
   QOI compared to PNG, per file:
-    Decode: 0.38698604755334
+    Decode: 0.34231017581238
     Encode: 0.34310845217883
     Size:   1.2430595164478
   Average time:
     DecodePNG: 150.4121290749
-    DecodeQOI: 59.845571473789
+    DecodeQOI: 52.690368464417
     EncodePNG: 741.51272768702
     EncodeQOI: 266.88024578322
   Size sum:
@@ -119,12 +119,12 @@ screenshot_web
 
 textures_photo
   QOI compared to PNG, per file:
-    Decode: 1.0898338623125
+    Decode: 0.84454924909681
     Encode: 0.56624157192784
     Size:   1.1774185560285
   Average time:
     DecodePNG: 31.12713910584
-    DecodeQOI: 32.827039508544
+    DecodeQOI: 25.532387796422
     EncodePNG: 311.56450589407
     EncodeQOI: 170.12869947365
   Size sum:
@@ -133,12 +133,12 @@ textures_photo
 
 textures_pk
   QOI compared to PNG, per file:
-    Decode: 2.8311278964179
+    Decode: 2.4340389527601
     Encode: 1.2918095345921
     Size:   1.8287477602161
   Average time:
     DecodePNG: 0.45948289893388
-    DecodeQOI: 1.1870841783151
+    DecodeQOI: 1.0101449170062
     EncodePNG: 5.0108224114575
     EncodeQOI: 6.3184441866021
   Size sum:
@@ -147,12 +147,12 @@ textures_pk
 
 textures_pk01
   QOI compared to PNG, per file:
-    Decode: 0.67776914228718
+    Decode: 0.55857850174478
     Encode: 0.65446210988305
     Size:   1.4744812073826
   Average time:
     DecodePNG: 4.1185476546758
-    DecodeQOI: 2.8731595813305
+    DecodeQOI: 2.3463312580094
     EncodePNG: 23.936036703094
     EncodeQOI: 15.266006512444
   Size sum:
@@ -161,12 +161,12 @@ textures_pk01
 
 textures_pk02
   QOI compared to PNG, per file:
-    Decode: 0.75227709663993
+    Decode: 0.61819427556861
     Encode: 0.60944630867147
     Size:   1.4711609675166
   Average time:
     DecodePNG: 10.745046389559
-    DecodeQOI: 8.2194532004279
+    DecodeQOI: 6.6736723351406
     EncodePNG: 86.963491525238
     EncodeQOI: 41.854746083005
   Size sum:
@@ -175,12 +175,12 @@ textures_pk02
 
 textures_plants
   QOI compared to PNG, per file:
-    Decode: 0.46174039200439
+    Decode: 0.36861002248873
     Encode: 0.33934650148502
     Size:   1.0885882379691
   Average time:
     DecodePNG: 36.024633994215
-    DecodeQOI: 15.184618425675
+    DecodeQOI: 12.077942494981
     EncodePNG: 255.00910390234
     EncodeQOI: 79.234469079906
   Size sum:
@@ -189,12 +189,12 @@ textures_plants
 
 total
   QOI compared to PNG, per file:
-    Decode: 1.3879457723159
+    Decode: 1.1860741835483
     Encode: 0.73182901109658
     Size:   1.7940648739604
   Average time:
     DecodePNG: 13.977600090521
-    DecodeQOI: 8.3821554207432
+    DecodeQOI: 6.8378311735929
     EncodePNG: 107.42338965439
     EncodeQOI: 42.527930365623
   Size sum:
@@ -205,20 +205,20 @@ total
 
 Summaries:
 
-Decode: 65% faster to 15% slower - sometimes 180% slower
-0.33607452469875
-0.38698604755334
-0.44988099525168
-0.46174039200439
-0.46764189329859
-0.58332069233204
-0.67776914228718
-0.75227709663993
-0.97796780996351
-1.068052571526
-1.0898338623125
-1.1715911010265
-2.8311278964179
+Decode: 10-70% faster - sometimes 140% slower
+0.30076459476648
+0.34231017581238
+0.36861002248873
+0.39557616287489
+0.41058490610189
+0.50260641656483
+0.55857850174478
+0.61819427556861
+0.75543458689158
+0.84454924909681
+0.86035102892538
+0.91597653012336
+2.4340389527601
 
 Encode: 35-70% faster - sometimes 30% slower
 0.28086523846066

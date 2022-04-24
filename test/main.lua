@@ -10,9 +10,9 @@ local ANALYZE_TEST_SUITE_RESULTS = 1==0 -- Outputs to stdout!
 local TEST_SUITE_START_INDEX = 1
 local TEST_SUITE_END_INDEX   = 1/0
 
-local TEST_SUITE_RESULTS_FILE = "Test suite results (2022-04-22, #3).txt" -- For ANALYZE_TEST_SUITE_RESULTS.
+local TEST_SUITE_RESULTS_FILE = "Test suite results (2022-04-24).txt" -- For ANALYZE_TEST_SUITE_RESULTS.
 
-local TEST_ENCODING = 1==1 -- Doesn't affect test suite.
+local TEST_ENCODING = 1==1 -- Limited effect on test suite.
 
 
 
@@ -65,7 +65,7 @@ if RUN_TEST_SUITE then
 
 		else
 			local time          = love.timer.getTime()
-			local qoiData, err  = qoi.encode(imageData)
+			local qoiData, err  = qoi.encode(imageData, 4, "srgb")
 			local qoiEncodeTime = love.timer.getTime() - time
 
 			if not qoiData then
@@ -80,17 +80,24 @@ if RUN_TEST_SUITE then
 					io.stderr:write("Error: ", err, "\n")
 
 				else
-					local time          = love.timer.getTime()
-					local fileData2     = imageData:encode("png", nil)
+					local fileData2 = nil
+					local time      = love.timer.getTime()
+					if TEST_ENCODING then
+						fileData2 = imageData:encode("png", nil)
+					end
 					local pngEncodeTime = love.timer.getTime() - time
 
-					print("size", imageData:getDimensions())
-					print("pngDecode", "-"                , pngDecodeTime*1000)
-					print("qoiDecode", "-"                , qoiDecodeTime*1000)
-					print("pngEncode", fileData2:getSize(), pngEncodeTime*1000)
-					print("qoiEncode", #qoiData           , qoiEncodeTime*1000)
+					local pngSize = fileData2 and fileData2:getSize() or 0
 
-					fileData2:release()
+					print("size", imageData:getDimensions())
+					print("pngDecode", "-"     , pngDecodeTime*1000)
+					print("qoiDecode", "-"     , qoiDecodeTime*1000)
+					print("pngEncode", pngSize , pngEncodeTime*1000)
+					print("qoiEncode", #qoiData, qoiEncodeTime*1000)
+
+					if fileData2 then
+						fileData2:release()
+					end
 					imageData2:release()
 				end
 			end
@@ -264,7 +271,7 @@ function love.load()
 
 			local qoiPath = basename .. ".qoi"
 			local time    = love.timer.getTime()
-			assert(qoi.write(imageData, qoiPath))
+			assert(qoi.write(imageData, qoiPath, 4, "srgb"))
 			time          = love.timer.getTime() - time
 			print("encode", time*1000, qoiPath)
 

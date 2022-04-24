@@ -107,9 +107,9 @@ function qoi.decode(s)
 	local prevB = 0
 	-- prevA not needed.
 
-	local r = prevR
-	local g = prevG
-	local b = prevB
+	local r = 0
+	local g = 0
+	local b = 0
 	local a = -1
 
 	local run = 0
