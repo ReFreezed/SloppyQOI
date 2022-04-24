@@ -102,19 +102,21 @@ function qoi.decode(s)
 		0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
 	}
 
-	local prevR = 0
+	local prevR = 0 -- Note: All these color values are treated as signed bytes.
 	local prevG = 0
 	local prevB = 0
-	local prevA = 255
+	-- prevA not needed.
 
 	local r = prevR
 	local g = prevG
 	local b = prevB
-	local a = prevA
+	local a = -1
 
 	local run = 0
 
-	local floor = math.floor
+	local band   = require"bit".band
+	local rshift = require"bit".rshift
+	local lshift = require"bit".lshift
 
 	for pixelIz = 0, 4*w*h-1, 4 do
 		if run > 0 then
@@ -139,7 +141,7 @@ function qoi.decode(s)
 
 			-- QOI_OP_INDEX 00xxxxxx
 			elseif byte1 < 64--[[01000000]] then
-				local hash4 = byte1 * 4
+				local hash4 = lshift(byte1, 2)
 
 				r = seen[hash4+1]
 				g = seen[hash4+2]
@@ -150,9 +152,9 @@ function qoi.decode(s)
 			elseif byte1 < 128--[[10000000]] then
 				byte1 = byte1 - 64--[[01000000]]
 
-				r = (prevR + floor(byte1*.0625--[[/16]])     - 2) % 256
-				g = (prevG + floor(byte1*.25  --[[/4 ]]) % 4 - 2) % 256
-				b = (prevB +       byte1                 % 4 - 2) % 256
+				r = prevR + rshift(band(byte1, 48--[[00110000]]), 4) - 2
+				g = prevG + rshift(band(byte1, 12--[[00001100]]), 2) - 2
+				b = prevB +        band(byte1, 3 --[[00000011]])     - 2
 
 			-- QOI_OP_LUMA 10xxxxxx
 			elseif byte1 < 192--[[11000000]] then
@@ -160,13 +162,13 @@ function qoi.decode(s)
 				if not byte2 then  return nil, "Unexpected end of data stream."  end
 				pos = pos + 1
 
-				local diffG       = byte1 - 128--[[10000000]] - 32
-				local diffR_diffG = floor(byte2*.0625--[[/16]]) - 8
-				local diffB_diffG = byte2 % 16 - 8
+				local diffG       = byte1 + (-(128--[[10000000]]) - 32)
+				local diffR_diffG = rshift(band(byte2, 240--[[11110000]]), 4) - 8
+				local diffB_diffG =        band(byte2, 15 --[[00001111]])     - 8
 
-				g = (prevG + diffG) % 256
-				r = ((diffR_diffG + (g-prevG)) + prevR) % 256
-				b = ((diffB_diffG + (g-prevG)) + prevB) % 256
+				g = prevG + diffG
+				r = (diffR_diffG + (g-prevG)) + prevR
+				b = (diffB_diffG + (g-prevG)) + prevB
 
 			-- QOI_OP_RUN 11xxxxxx
 			else
@@ -176,21 +178,14 @@ function qoi.decode(s)
 			prevR = r
 			prevG = g
 			prevB = b
-			prevA = a
 		end
 
-		-- if imageDataPointer then
-			imageDataPointer[pixelIz  ] = r
-			imageDataPointer[pixelIz+1] = g
-			imageDataPointer[pixelIz+2] = b
-			imageDataPointer[pixelIz+3] = a
-		-- else
-		-- 	local x = (pixelIz/4) % w
-		-- 	local y = floor((pixelIz/4) / w)
-		-- 	imageData:setPixel(x, y, r/255, g/255, b/255, a/255)
-		-- end
+		imageDataPointer[pixelIz  ] = r
+		imageDataPointer[pixelIz+1] = g
+		imageDataPointer[pixelIz+2] = b
+		imageDataPointer[pixelIz+3] = a
 
-		local hash4   = ((r*3 + g*5 + b*7 + a*11) % 64) * 4
+		local hash4   = lshift(band(r*3+g*5+b*7+a*11, 63--[[00111111]]), 2)
 		seen[hash4+1] = r
 		seen[hash4+2] = g
 		seen[hash4+3] = b
@@ -258,7 +253,7 @@ function qoi.encode(imageData, channels, colorSpace)
 	--
 	-- Data stream.
 	--
-	local imageDataPointer = require"ffi".cast("uint8_t*", imageData:getFFIPointer()) -- @Incomplete: ImageData can be different formats!
+	local imageDataPointer = require"ffi".cast("uint8_t*", imageData:getFFIPointer()) -- @Incomplete: Support different ImageData PixelFormats.
 	local maxPixelIz       = 4*(w*h-1)
 
 	local seen = {
@@ -277,22 +272,10 @@ function qoi.encode(imageData, channels, colorSpace)
 	local run = 0
 
 	for pixelIz = 0, 4*(w*h-1), 4 do
-		-- local r, g, b, a
-
-		-- if imageDataPointer then
-			local r = imageDataPointer[pixelIz  ]
-			local g = imageDataPointer[pixelIz+1]
-			local b = imageDataPointer[pixelIz+2]
-			local a = imageDataPointer[pixelIz+3]
-		-- else
-		-- 	local x    = (pixelIz/4) % w
-		-- 	local y    = floor((pixelIz/4) / w)
-		-- 	r, g, b, a = imageData:getPixel(x, y)
-		-- 	r          = floor(r/255+.5)
-		-- 	g          = floor(g/255+.5)
-		-- 	b          = floor(b/255+.5)
-		-- 	a          = floor(a/255+.5)
-		-- end
+		local r = imageDataPointer[pixelIz  ]
+		local g = imageDataPointer[pixelIz+1]
+		local b = imageDataPointer[pixelIz+2]
+		local a = imageDataPointer[pixelIz+3]
 
 		if r == prevR and g == prevG and b == prevB and a == prevA then
 			run = run + 1
