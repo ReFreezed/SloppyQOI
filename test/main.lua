@@ -183,13 +183,18 @@ if ANALYZE_TEST_SUITE_RESULTS then
 		sizeSumQoi.total   = sizeSumQoi.total   + qoiSize
 		sizeSumQoi[folder] = sizeSumQoi[folder] + qoiSize
 
-		--[[
+		--[[ When QOI is slower than PNG.
 		if 2*tonumber(pngDecodeTime) < tonumber(qoiDecodeTime) then
 			print(path)
 			print("-qoi", qoiDecodeTime)
 			print("-png", pngDecodeTime)
 			print()
 		end
+		--]]
+
+		--[[ Compession ratio.
+		local rawSize = w * h * 4 -- 32 bits per pixel.
+		print(string.format("png/qoi %2d%%/%2d%%  %s", pngSize/rawSize*100, qoiSize/rawSize*100, path))
 		--]]
 	end
 

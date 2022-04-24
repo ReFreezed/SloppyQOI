@@ -15,7 +15,7 @@ I mostly just made this for fun, but it seems using QOI and this library actuall
 
 ```lua
 local qoi         = require"qoi"
-local playerImage = love.graphics.newImage(qoi.read"images/player.qoi")
+local playerImage = love.graphics.newImage((qoi.read"images/player.qoi"))
 ```
 
 See the top of [qoi.lua](https://raw.githubusercontent.com/ReFreezed/SloppyQOI/master/qoi.lua) for documentation.
