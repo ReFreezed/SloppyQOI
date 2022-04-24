@@ -1,0 +1,8 @@
+Changelog
+SloppyQOI
+
+v1.1 (2022-04-24)
+- Added qoi.load().
+
+v1.0 (2022-04-24)
+- Initial release!

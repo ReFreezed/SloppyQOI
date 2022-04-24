@@ -35,6 +35,9 @@
 	Write an image to a QOI file (using love.filesystem).
 	The PixelFormat for imageData must currently be "rgba8".
 
+	image = qoi.load( path )
+	Load a QOI file as an image (like love.graphics.newImage).
+
 	qoi._VERSION
 	The current version of the library, e.g. "1.8.2".
 
@@ -91,7 +94,7 @@ function qoi.decode(s)
 	--
 	-- Data stream.
 	--
-	local imageData        = love.image.newImageData(w, h, "rgba8")
+	local imageData        = require"love.image".newImageData(w, h, "rgba8")
 	local imageDataPointer = require"ffi".cast("uint8_t*", imageData:getFFIPointer())
 
 	local seen = {
@@ -384,6 +387,22 @@ function qoi.write(imageData, path, channels, colorSpace)
 	if not ok then  return false, err  end
 
 	return true
+end
+
+
+
+-- image = qoi.load( path )
+-- Substitute for love.graphics.newImage().
+function qoi.load(path)
+	assert(type(path) == "string")
+
+	local imageData, err = qoi.read(path)
+	if not imageData then  error(err, 2)  end
+
+	local image = require"love.graphics".newImage(imageData)
+	imageData:release()
+
+	return image
 end
 
 
