@@ -14,20 +14,24 @@
 
 	local qoi = require("qoi")
 
-	imageData = qoi.decode( dataString )
+	imageData, channels, colorSpace = qoi.decode( dataString )
 	Decode QOI data.
 	Returns nil and a message on error.
 
-	dataString = qoi.encode( imageData )
+	dataString = qoi.encode( imageData [, channels=4, colorSpace="linear" ] )
+	channels   = 3 | 4
+	colorSpace = "linear" | "srgb"
 	Encode an image to QOI data.
 	The PixelFormat for imageData must currently be "rgba8".
 	Returns nil and a message on error.
 
-	imageData = qoi.read( path )
+	imageData, channels, colorSpace = qoi.read( path )
 	Read a QOI file (using love.filesystem).
 	Returns nil and a message on error.
 
-	success, error = qoi.write( imageData, path )
+	success, error = qoi.write( imageData, path [, channels=4, colorSpace="linear" ] )
+	channels       = 3 | 4
+	colorSpace     = "linear" | "srgb"
 	Write an image to a QOI file (using love.filesystem).
 	The PixelFormat for imageData must currently be "rgba8".
 
@@ -42,9 +46,11 @@ local qoi = {
 
 
 
--- imageData = qoi.decode( dataString )
+-- imageData, channels, colorSpace = qoi.decode( dataString )
 -- Returns nil and a message on error.
 function qoi.decode(s)
+	assert(type(s) == "string")
+
 	local pos = 1
 
 	--
@@ -79,7 +85,8 @@ function qoi.decode(s)
 	if colorSpace > 1 then
 		return nil, "Invalid color space value."
 	end
-	pos = pos + 1
+	colorSpace = (colorSpace == 0 and "srgb" or "linear")
+	pos        = pos + 1
 
 	--
 	-- Data stream.
@@ -203,12 +210,19 @@ function qoi.decode(s)
 		return nil, "Junk after data."
 	end
 
-	return imageData
+	return imageData, channels, colorSpace
 end
 
--- dataString = qoi.encode( imageData )
+-- dataString = qoi.encode( imageData [, channels=4, colorSpace="linear" ] )
 -- Returns nil and a message on error.
-function qoi.encode(imageData)
+function qoi.encode(imageData, channels, colorSpace)
+	channels   = channels   or 4
+	colorSpace = colorSpace or "linear"
+
+	assert(type(imageData) == "userdata")
+	assert(channels == 3 or channels == 4)
+	assert(colorSpace == "srgb" or colorSpace == "linear")
+
 	if imageData:getFormat() ~= "rgba8" then
 		return nil, "Unsupported format '"..imageData:getFormat().."'. (Only 'rgba8' is supported.)"
 	end
@@ -238,8 +252,8 @@ function qoi.encode(imageData)
 	insert(buffer, toChar(floor(h/256  ) % 256))
 	insert(buffer, toChar(      h        % 256))
 
-	insert(buffer, "\4") -- channels (3 or 4)
-	insert(buffer, "\1") -- color space (0=srgb, 1=linear)
+	insert(buffer, (channels   == 3      and "\3" or "\4")) -- channels (3 or 4)
+	insert(buffer, (colorSpace == "srgb" and "\0" or "\1")) -- color space (0=srgb, 1=linear)
 
 	--
 	-- Data stream.
@@ -359,18 +373,28 @@ end
 
 
 
--- imageData = qoi.read( path )
+-- imageData, channels, colorSpace = qoi.read( path )
 -- Returns nil and a message on error.
 function qoi.read(path)
+	assert(type(path) == "string")
+
 	local s, err = love.filesystem.read(path)
 	if not s then  return nil, err  end
 
 	return qoi.decode(s)
 end
 
--- success, error = qoi.write( imageData, path )
-function qoi.write(imageData, path)
-	local s, err = qoi.encode(imageData)
+-- success, error = qoi.write( imageData, path [, channels=4, colorSpace="linear" ] )
+function qoi.write(imageData, path, channels, colorSpace)
+	channels   = channels   or 4
+	colorSpace = colorSpace or "linear"
+
+	assert(type(imageData) == "userdata")
+	assert(type(path) == "string")
+	assert(channels == 3 or channels == 4)
+	assert(colorSpace == "srgb" or colorSpace == "linear")
+
+	local s, err = qoi.encode(imageData, channels, colorSpace)
 	if not s then  return false, err  end
 
 	local ok, err = love.filesystem.write(path, s)

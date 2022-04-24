@@ -268,7 +268,8 @@ function love.load()
 			time          = love.timer.getTime() - time
 			print("encode", time*1000, qoiPath)
 
-			table.insert(images2, love.graphics.newImage(assert(qoi.read(qoiPath))))
+			local imageData2 = assert(qoi.read(qoiPath))
+			table.insert(images2, love.graphics.newImage(imageData2))
 		end
 	end
 end
