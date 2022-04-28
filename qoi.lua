@@ -165,13 +165,11 @@ function qoi.decode(s)
 				if not byte2 then  return nil, "Unexpected end of data stream."  end
 				pos = pos + 1
 
-				local diffG       = byte1 + (-(128--[[10000000]]) - 32)
-				local diffR_diffG = rshift(band(byte2, 240--[[11110000]]), 4) - 8
-				local diffB_diffG =        band(byte2, 15 --[[00001111]])     - 8
+				local diffG = byte1 + (-(128--[[10000000]]) - 32)
 
 				g = prevG + diffG
-				r = (diffR_diffG + (g-prevG)) + prevR
-				b = (diffB_diffG + (g-prevG)) + prevB
+				r = prevR + diffG + rshift(band(byte2, 240--[[11110000]]), 4) - 8
+				b = prevB + diffG +        band(byte2, 15 --[[00001111]])     - 8
 
 			-- QOI_OP_RUN 11xxxxxx
 			else
