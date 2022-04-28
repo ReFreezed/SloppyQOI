@@ -47,6 +47,13 @@ local qoi = {
 	_VERSION = "1.1.0",
 }
 
+local newTable = pcall(require, "table.new") and require"table.new" or nil -- LuaJIT 2.1 has table.new!
+
+local CHARS = newTable and newTable(255, 0) or {}
+for i = 0, 255 do
+	CHARS[i] = string.char(i)
+end
+
 
 
 -- imageData, channels, colorSpace = qoi.decode( dataString )
@@ -223,30 +230,29 @@ function qoi.encode(imageData, channels, colorSpace)
 		return nil, "Unsupported format '"..imageData:getFormat().."'. (Only 'rgba8' is supported.)"
 	end
 
-	local buffer = {}
+	local w, h = imageData:getDimensions()
+	if w >= 256^4 then  return nil, "Image is too wide."  end
+	if h >= 256^4 then  return nil, "Image is too tall."  end
+
+	local buffer = newTable and newTable(11+w*h*2+1, 0) or {} -- Assume pretty good case scenario for the file size (2 bytes per pixel).
 
 	--
 	-- Header.
 	--
 	local insert = table.insert
-	local toChar = string.char
 	local floor  = math.floor
 
 	insert(buffer, "qoif")
 
-	local w, h = imageData:getDimensions()
-	if w >= 256^4 then  return nil, "Image is too wide."  end
-	if h >= 256^4 then  return nil, "Image is too tall."  end
+	insert(buffer, CHARS[floor(w/256^3)      ])
+	insert(buffer, CHARS[floor(w/256^2) % 256])
+	insert(buffer, CHARS[floor(w/256  ) % 256])
+	insert(buffer, CHARS[      w        % 256])
 
-	insert(buffer, toChar(floor(w/256^3)      ))
-	insert(buffer, toChar(floor(w/256^2) % 256))
-	insert(buffer, toChar(floor(w/256  ) % 256))
-	insert(buffer, toChar(      w        % 256))
-
-	insert(buffer, toChar(floor(h/256^3)      ))
-	insert(buffer, toChar(floor(h/256^2) % 256))
-	insert(buffer, toChar(floor(h/256  ) % 256))
-	insert(buffer, toChar(      h        % 256))
+	insert(buffer, CHARS[floor(h/256^3)      ])
+	insert(buffer, CHARS[floor(h/256^2) % 256])
+	insert(buffer, CHARS[floor(h/256  ) % 256])
+	insert(buffer, CHARS[      h        % 256])
 
 	insert(buffer, (channels   == 3      and "\3" or "\4")) -- channels (3 or 4)
 	insert(buffer, (colorSpace == "srgb" and "\0" or "\1")) -- color space (0=srgb, 1=linear)
@@ -272,6 +278,9 @@ function qoi.encode(imageData, channels, colorSpace)
 
 	local run = 0
 
+	local band   = require"bit".band
+	local lshift = require"bit".lshift
+
 	for pixelIz = 0, 4*(w*h-1), 4 do
 		local r = imageDataPointer[pixelIz  ]
 		local g = imageDataPointer[pixelIz+1]
@@ -282,21 +291,21 @@ function qoi.encode(imageData, channels, colorSpace)
 			run = run + 1
 
 			if run == 62 or pixelIz == maxPixelIz then
-				insert(buffer, toChar(192--[[11000000]]+(run-1))) -- QOI_OP_RUN 11xxxxxx
+				insert(buffer, CHARS[192--[[11000000]]+(run-1)]) -- QOI_OP_RUN 11xxxxxx
 				run = 0
 			end
 
 		else
 			if run > 0 then
-				insert(buffer, toChar(192--[[11000000]]+(run-1))) -- QOI_OP_RUN 11xxxxxx
+				insert(buffer, CHARS[192--[[11000000]]+(run-1)]) -- QOI_OP_RUN 11xxxxxx
 				run = 0
 			end
 
-			local hash  = (r*3 + g*5 + b*7 + a*11) % 64
-			local hash4 = hash * 4
+			local hash  = band(r*3+g*5+b*7+a*11, 63--[[00111111]])
+			local hash4 = lshift(hash, 2)
 
 			if r == seen[hash4+1] and g == seen[hash4+2] and b == seen[hash4+3] and a == seen[hash4+4] then
-				insert(buffer, toChar(--[[00000000+]]hash)) -- QOI_OP_INDEX 00xxxxxx
+				insert(buffer, CHARS[--[[00000000+]]hash]) -- QOI_OP_INDEX 00xxxxxx
 
 			else
 				seen[hash4+1] = r
@@ -313,33 +322,33 @@ function qoi.encode(imageData, channels, colorSpace)
 					   and deltaG >= -2 and deltaG <= 1
 					   and deltaB >= -2 and deltaB <= 1
 					then
-						insert(buffer, toChar(64--[[01000000]] + (deltaR+2)*16 + (deltaG+2)*4 + (deltaB+2))) -- QOI_OP_DIFF 01xxxxxx
+						insert(buffer, CHARS[64--[[01000000]] + (deltaR+2)*16 + (deltaG+2)*4 + (deltaB+2)]) -- QOI_OP_DIFF 01xxxxxx
 
 					else
-						local deltaRg = deltaR - deltaG
+						local deltaRg = deltaR - deltaG -- Should we wrap these values too?
 						local deltaBg = deltaB - deltaG
 
 						if     deltaRg >= -8  and deltaRg <= 7
 						   and deltaG  >= -32 and deltaG  <= 31
 						   and deltaBg >= -8  and deltaBg <= 7
 						then
-							insert(buffer, toChar(128--[[10000000]] + (deltaG +32))) -- QOI_OP_LUMA 10xxxxxx
-							insert(buffer, toChar((deltaRg+8)*16    + (deltaBg+8 )))
+							insert(buffer, CHARS[128--[[10000000]] + (deltaG +32)]) -- QOI_OP_LUMA 10xxxxxx
+							insert(buffer, CHARS[(deltaRg+8)*16    + (deltaBg+8 )])
 
 						else
 							insert(buffer, "\254"--[[11111110]]) -- QOI_OP_RGB 11111110
-							insert(buffer, toChar(r))
-							insert(buffer, toChar(g))
-							insert(buffer, toChar(b))
+							insert(buffer, CHARS[r])
+							insert(buffer, CHARS[g])
+							insert(buffer, CHARS[b])
 						end
 					end
 
 				else
 					insert(buffer, "\255"--[[11111111]]) -- QOI_OP_RGBA 11111111
-					insert(buffer, toChar(r))
-					insert(buffer, toChar(g))
-					insert(buffer, toChar(b))
-					insert(buffer, toChar(a))
+					insert(buffer, CHARS[r])
+					insert(buffer, CHARS[g])
+					insert(buffer, CHARS[b])
+					insert(buffer, CHARS[a])
 				end
 			end
 

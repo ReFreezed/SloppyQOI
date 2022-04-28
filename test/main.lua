@@ -10,7 +10,7 @@ local ANALYZE_TEST_SUITE_RESULTS = 1==0 -- Outputs to stdout!
 local TEST_SUITE_START_INDEX = 1
 local TEST_SUITE_END_INDEX   = 1/0
 
-local TEST_SUITE_RESULTS_FILE = "Test suite results (2022-04-24).txt" -- For ANALYZE_TEST_SUITE_RESULTS.
+local TEST_SUITE_RESULTS_FILE = "Test suite results (2022-04-28).txt" -- For ANALYZE_TEST_SUITE_RESULTS.
 
 local TEST_ENCODING = 1==1 -- Limited effect on test suite.
 
