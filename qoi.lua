@@ -120,7 +120,7 @@ function qoi.decode(s)
 	local r = 0
 	local g = 0
 	local b = 0
-	local a = -1
+	local a = 255
 
 	local run = 0
 
